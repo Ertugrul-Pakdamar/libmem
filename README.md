@@ -339,3 +339,50 @@ void  slab_init(mem_slab_t *slab, mem_slab_config_t *configs, size_t count);
 void *slab_alloc(mem_slab_t *slab, size_t size);
 void  slab_free(mem_slab_t *slab, void *ptr);
 ```
+
+---
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`).
+
+| Change | Bump |
+|---|---|
+| Bug fix, no API change | `PATCH` → `0.1.0 → 0.1.1` |
+| New allocator function or type added, existing API unchanged | `MINOR` → `0.1.0 → 0.2.0` |
+| Function signature changed, type removed, or struct layout broken | `MAJOR` → `0.x.y → 1.0.0` |
+
+> While `MAJOR == 0` (pre-release), breaking changes may be reflected in `MINOR` instead.  
+> The API is not considered stable until `v1.0.0`.
+
+### Current version
+
+`v0.1.0` — defined in `include/memory.h`:
+
+```c
+#define LIBMEM_VERSION_MAJOR 0
+#define LIBMEM_VERSION_MINOR 1
+#define LIBMEM_VERSION_PATCH 0
+#define LIBMEM_VERSION       "0.1.0"
+```
+
+### Compile-time version check
+
+```c
+#include "include/memory.h"
+
+#if LIBMEM_VERSION_MAJOR == 0 && LIBMEM_VERSION_MINOR >= 1
+    /* use a feature added in v0.1 */
+#endif
+```
+
+### Git tags
+
+Each release is tagged in the repository:
+
+```bash
+git tag -a v0.1.0 -m "Initial public release"
+git push origin v0.1.0
+```
+
+List all available tags: `git tag -l`

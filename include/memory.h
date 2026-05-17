@@ -14,6 +14,12 @@
 #ifndef MEMORY_H
 # define MEMORY_H
 
+/* ---- Version ------------------------------------------------------------- */
+# define LIBMEM_VERSION_MAJOR 0
+# define LIBMEM_VERSION_MINOR 1
+# define LIBMEM_VERSION_PATCH 0
+# define LIBMEM_VERSION       "0.1.0"
+
 # include <stddef.h>
 
 /* ---- Pool ---------------------------------------------------------------- */
