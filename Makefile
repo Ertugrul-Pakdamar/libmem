@@ -1,9 +1,13 @@
 NAME = libmem.a
 CFLAGS = -Wall -Wextra -Werror -Iinclude
 
-SRC = lib/memory.c
+SRC = lib/pool.c \
+		lib/arena.c \
+		lib/slab.c
 
-OBJ = build/memory.o
+OBJ = build/pool.o \
+		build/arena.o \
+		build/slab.o
 
 default: $(NAME)
 
