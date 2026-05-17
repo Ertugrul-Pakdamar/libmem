@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "memory.h"
 
 static void sort_pools(mem_pool_t *pools, size_t count)

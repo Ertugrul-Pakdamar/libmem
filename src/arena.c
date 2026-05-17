@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "memory.h"
 
 void    arena_init(mem_arena_t *arena, void *buffer, size_t size)
