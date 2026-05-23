@@ -20,7 +20,7 @@ Contributions are welcome. Please read this guide before opening a PR.
 ```bash
 # 1. Fork the repo on GitHub
 # 2. Clone your fork
-git clone https://github.com/<your-username>/libmem.git
+git clone https://github.com/Ertugrul-Pakdamar/libmem.git
 cd libmem
 
 # 3. Create a feature branch
