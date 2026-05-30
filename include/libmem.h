@@ -1,5 +1,5 @@
 /**
- * @file memory.h
+ * @file libmem.h
  * @brief libmem public API — pool, arena, and slab allocators.
  *
  * All allocators operate on caller-supplied buffers. No internal malloc is

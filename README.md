@@ -30,7 +30,7 @@ libmem/
 │   ├── arena.c              linear bump allocator
 │   └── slab.c               multi-pool variable-size allocator
 ├── include/
-│   └── memory.h             public API  ← start here
+│   └── libmem.h             public API  ← start here
 ├── examples/
 │   ├── 01_pool.c            pool alloc / free / reuse
 │   ├── 02_arena.c           bump allocation, reset, reuse
@@ -85,7 +85,7 @@ Maintains an intrusive free-list inside a caller-supplied buffer. Every block
 is the same size. Both alloc and free are O(1).
 
 ```c
-#include "memory.h"
+#include "libmem.h"
 
 static unsigned char buf[sizeof(MyStruct) * 32];
 
@@ -189,7 +189,7 @@ void  slab_free(mem_slab_t *slab, void *ptr);
 ```bash
 # Option A — copy files
 cp libmem.a          /your/project/lib/
-cp include/memory.h  /your/project/include/
+cp include/libmem.h  /your/project/include/
 
 # Link
 cc main.c -o app -Iinclude -Llib -lmem
@@ -225,7 +225,7 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 
 ### Current version
 
-`v0.1.0` — defined in `include/memory.h`:
+`v0.1.0` — defined in `include/libmem.h`:
 
 ```c
 #define LIBMEM_VERSION_MAJOR 0
@@ -237,7 +237,7 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 ### Compile-time version check
 
 ```c
-#include "include/memory.h"
+#include "include/libmem.h"
 
 #if LIBMEM_VERSION_MAJOR == 0 && LIBMEM_VERSION_MINOR >= 1
     /* use a feature added in v0.1 */

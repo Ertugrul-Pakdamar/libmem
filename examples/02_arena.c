@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "memory.h"
+#include "libmem.h"
 
 #define ARENA_SIZE 256
 

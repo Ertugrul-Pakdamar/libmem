@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "memory.h"
+#include "libmem.h"
 
 /* Three pools: 16-byte, 64-byte, 256-byte blocks, 4 blocks each. */
 #define SMALL_SIZE   16

@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "memory.h"
+#include "libmem.h"
 
 #define BLOCK_SIZE  32
 #define BLOCK_COUNT  4

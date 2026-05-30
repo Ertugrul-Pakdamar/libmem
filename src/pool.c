@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "memory.h"
+#include "libmem.h"
 
 void pool_init(mem_pool_t *pool, void *buffer, size_t block_size, size_t block_count)
 {
