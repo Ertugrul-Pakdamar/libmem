@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "memory.h"
+#include "libmem.h"
 
 static void sort_pools(mem_pool_t *pools, size_t count)
 {

@@ -38,7 +38,7 @@ make re
 
 - C11, compiled with `-Wall -Wextra -Werror` — zero warnings required
 - No `malloc` / `free` inside the library — all memory is caller-supplied
-- New public functions must be declared in `include/memory.h` with Doxygen
+- New public functions must be declared in `include/libmem.h` with Doxygen
   `/** @brief @param @return */` comments
 - Follow the existing `snake_case` naming convention and `mem_` prefix for types
 
@@ -68,7 +68,7 @@ examples/NN_short_name.c     (NN = two-digit number, e.g. 04_pool_introspect.c)
 
 ## Bumping the Version
 
-When a contribution changes the public API, the version macros in `include/memory.h`
+When a contribution changes the public API, the version macros in `include/libmem.h`
 must be updated as part of the **same commit**.  
 Follow [Semantic Versioning](https://semver.org/):
 
@@ -82,6 +82,6 @@ Follow [Semantic Versioning](https://semver.org/):
 
 ### Steps
 
-1. Update the three numeric macros in `include/memory.h`.
+1. Update the three numeric macros in `include/libmem.h`.
 2. Update `LIBMEM_VERSION` string to match.
 3. The maintainer will create a git tag after merging (`git tag vX.Y.Z`).
