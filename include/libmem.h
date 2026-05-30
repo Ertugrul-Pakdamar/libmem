@@ -11,8 +11,12 @@
  *  - Slab  — variable-size backed by multiple pools, picks the smallest fitting pool.
  */
 
-#ifndef MEMORY_H
-# define MEMORY_H
+#ifndef LIBMEM_H
+# define LIBMEM_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ---- Version ------------------------------------------------------------- */
 # define LIBMEM_VERSION_MAJOR 0
@@ -147,4 +151,7 @@ void   *slab_alloc(mem_slab_t *slab, size_t size);
  */
 void    slab_free(mem_slab_t *slab, void *ptr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
