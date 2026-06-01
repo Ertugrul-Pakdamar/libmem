@@ -25,6 +25,7 @@ extern "C" {
 # define LIBMEM_VERSION       "0.1.0"
 
 # include <stddef.h>
+# include <stdint.h>
 
 /* ---- Pool ---------------------------------------------------------------- */
 
