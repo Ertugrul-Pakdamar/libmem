@@ -4,8 +4,9 @@
 #
 #  Targets:
 #
-#    help      Show this message                      (default)
-#    all       Build libmem.a
+#    help      Show this message                             (default)
+#    all       Build libmem.a  (release)
+#    debug     Build libmem.a with -DLIBMEM_DEBUG + -g
 #    examples  Build all programs in examples/
 #    clean     Remove object files and example binaries
 #    fclean    clean + remove libmem.a
@@ -24,12 +25,14 @@ SRC :=  src/pool.c   \
         src/arena.c  \
         src/slab.c
 
-OBJ := $(SRC:src/%.c=build/%.o)
+OBJ       := $(SRC:src/%.c=build/%.o)
+OBJ_DEBUG := $(SRC:src/%.c=build/debug_%.o)
 
 RESET  := \033[0m
 BOLD   := \033[1m
 DIM    := \033[2m
 GREEN  := \033[32m
+YELLOW := \033[33m
 CYAN   := \033[36m
 
 # =============================================================================
@@ -39,14 +42,19 @@ CYAN   := \033[36m
 .PHONY: help
 help:
 	@printf "\n$(BOLD)libmem$(RESET) — available targets\n\n"
-	@printf "  $(CYAN)%-14s$(RESET) %s\n" "make all"      "Build $(NAME)"
-	@printf "  $(CYAN)%-14s$(RESET) %s\n" "make examples" "Build all programs in examples/"
-	@printf "  $(CYAN)%-14s$(RESET) %s\n" "make clean"    "Remove object files and example binaries"
-	@printf "  $(CYAN)%-14s$(RESET) %s\n" "make fclean"   "clean + remove $(NAME)"
-	@printf "  $(CYAN)%-14s$(RESET) %s\n" "make re"       "fclean + all"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make all"      "Build $(NAME)  (release)"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make debug"    "Build $(NAME) with -DLIBMEM_DEBUG -g"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make examples" "Build all programs in examples/"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make clean"    "Remove object files and example binaries"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make fclean"   "clean + remove $(NAME)"
+	@printf "  $(CYAN)%-16s$(RESET) %s\n" "make re"       "fclean + all"
 	@printf "\n"
 
-## all: Build libmem.a
+# =============================================================================
+# Release build
+# =============================================================================
+
+## all: Build libmem.a (release)
 .PHONY: all
 all: $(NAME)
 
@@ -59,7 +67,22 @@ build:
 
 $(NAME): $(OBJ)
 	@$(AR) $(ARFLAGS) $@ $^
-	@printf "$(GREEN)$(BOLD)✓ $(NAME)$(RESET)\n"
+	@printf "$(GREEN)$(BOLD)✓ $(NAME) (release)$(RESET)\n"
+
+# =============================================================================
+# Debug build  (-DLIBMEM_DEBUG enables stats and double-free detection)
+# =============================================================================
+
+## debug: Build libmem.a with debug flags
+.PHONY: debug
+debug: CFLAGS += -g -DLIBMEM_DEBUG
+debug: $(OBJ_DEBUG)
+	@$(AR) $(ARFLAGS) $(NAME) $^
+	@printf "$(YELLOW)$(BOLD)✓ $(NAME) (debug — LIBMEM_DEBUG)$(RESET)\n"
+
+build/debug_%.o: src/%.c | build
+	@printf "  $(DIM)CC$(RESET)  $< $(YELLOW)[debug]$(RESET)\n"
+	@$(CC) $(CFLAGS) -g -DLIBMEM_DEBUG -c $< -o $@
 
 # =============================================================================
 # Examples
@@ -87,7 +110,7 @@ examples/bin:
 ## clean: Remove object files and example binaries
 .PHONY: clean
 clean:
-	@rm -rf examples/bin $(OBJ)
+	@rm -rf examples/bin $(OBJ) $(OBJ_DEBUG)
 	@printf "$(DIM)libmem: cleaned$(RESET)\n"
 
 ## fclean: clean + remove libmem.a
