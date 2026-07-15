@@ -29,10 +29,10 @@ extern "C" {
 #endif
 
 /* ---- Version ------------------------------------------------------------- */
-# define LIBMEM_VERSION_MAJOR 0
-# define LIBMEM_VERSION_MINOR 2
+# define LIBMEM_VERSION_MAJOR 1
+# define LIBMEM_VERSION_MINOR 0
 # define LIBMEM_VERSION_PATCH 0
-# define LIBMEM_VERSION       "0.2.0"
+# define LIBMEM_VERSION       "1.0.0"
 
 # include <stddef.h>
 # include <stdint.h>
