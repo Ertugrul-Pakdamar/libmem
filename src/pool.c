@@ -33,10 +33,17 @@ void    pool_init(mem_pool_t *pool, void *buffer,
     size_t   i;
     size_t   min_align;
 
+    /*
+     * Initialize all fields to a safe "unusable" state first.
+     * total_blocks and free_blocks are set to 0 here so that if any
+     * validation below fails, slab_alloc() will correctly skip this pool
+     * (free_blocks == 0 prevents it from being selected) and pool_free()
+     * will safely reject any pointer via the saturation guard.
+     */
     pool->start_addr   = buffer;
     pool->block_size   = block_size;
-    pool->total_blocks = block_count;
-    pool->free_blocks  = block_count;
+    pool->total_blocks = 0;
+    pool->free_blocks  = 0;
     pool->free_head    = NULL;
 
 #ifdef LIBMEM_DEBUG
@@ -88,8 +95,11 @@ void    pool_init(mem_pool_t *pool, void *buffer,
         return ;
     }
 
-    /* --- Build the intrusive free-list ------------------------------------ */
-    pool->free_head = buffer;
+    /* --- All validation passed: build the free-list ----------------------- */
+    pool->total_blocks = block_count;
+    pool->free_blocks  = block_count;
+    pool->free_head    = buffer;
+
     curr = (uint8_t *)buffer;
     for (i = 0; i < block_count - 1; i++)
     {
@@ -131,8 +141,16 @@ void    pool_free(mem_pool_t *pool, void *ptr)
     uint8_t *p;
     uint8_t *start;
     uint8_t *end;
+    size_t   block_offset;
 
     if (ptr == NULL)
+        return ;
+
+    /*
+     * Guard against an invalidly initialized pool (block_size == 0 would
+     * cause a division-by-zero in the block-boundary check below).
+     */
+    if (pool->block_size == 0 || pool->total_blocks == 0)
         return ;
 
     p     = (uint8_t *)ptr;
@@ -141,6 +159,18 @@ void    pool_free(mem_pool_t *pool, void *ptr)
 
     /* Bounds check: reject pointers outside this pool's buffer. */
     if (p < start || p >= end)
+        return ;
+
+    /*
+     * Block-boundary check: reject pointers that do not point to the start
+     * of a block.  Without this, a caller passing (block + 1) would corrupt
+     * the free-list by writing a void* into an unaligned location.
+     *
+     * This also protects slab_free() indirectly, since slab_free() delegates
+     * to pool_free() after a range match.
+     */
+    block_offset = (size_t)(p - start);
+    if (block_offset % pool->block_size != 0)
         return ;
 
     /* Saturation guard: do not increment free_blocks past total_blocks. */
