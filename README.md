@@ -302,13 +302,13 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 
 ### Current version
 
-`v0.2.0` — defined in `include/libmem.h`:
+`v1.0.0` — defined in `include/libmem.h`:
 
 ```c
-#define LIBMEM_VERSION_MAJOR 0
-#define LIBMEM_VERSION_MINOR 2
+#define LIBMEM_VERSION_MAJOR 1
+#define LIBMEM_VERSION_MINOR 0
 #define LIBMEM_VERSION_PATCH 0
-#define LIBMEM_VERSION       "0.2.0"
+#define LIBMEM_VERSION       "1.0.0"
 ```
 
 ### Compile-time version check
@@ -316,8 +316,8 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 ```c
 #include "libmem.h"
 
-#if LIBMEM_VERSION_MAJOR == 0 && LIBMEM_VERSION_MINOR >= 2
-    /* arena_mark / arena_rewind, pool_used, arena_used available */
+#if LIBMEM_VERSION_MAJOR >= 1
+    /* Stable API: alignment, mark/rewind, usage queries, debug mode */
 #endif
 ```
 
@@ -326,8 +326,8 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 Each release is tagged in the repository:
 
 ```bash
-git tag -a v0.2.0 -m "v0.2.0: alignment, mark/rewind, debug mode, usage queries"
-git push origin v0.2.0
+git tag -a v1.0.0 -m "v1.0.0: stable API — alignment, mark/rewind, debug mode, usage queries, critical safety fixes"
+git push origin v1.0.0
 ```
 
 List all available tags: `git tag -l`

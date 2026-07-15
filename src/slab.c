@@ -52,12 +52,27 @@ void    slab_init(mem_slab_t *slab, mem_slab_config_t *configs, size_t count)
 void    *slab_alloc(mem_slab_t *slab, size_t size)
 {
     size_t  i;
+    void   *result;
 
     for (i = 0; i < slab->count; i++)
     {
         if (slab->pools[i].block_size >= size
             && slab->pools[i].free_blocks > 0)
-            return (pool_alloc(&slab->pools[i]));
+        {
+            /*
+             * pool_alloc() may still return NULL if the pool was left in
+             * an invalid state (e.g. buffer misalignment caught at init time
+             * but free_head is NULL while free_blocks was non-zero in older
+             * code).  Continue to the next larger pool instead of giving up.
+             *
+             * With the current pool_init() this case cannot occur because
+             * free_blocks is initialised to 0 on validation failure, but the
+             * fallback is kept for defensive correctness.
+             */
+            result = pool_alloc(&slab->pools[i]);
+            if (result)
+                return (result);
+        }
     }
     return (NULL);
 }
@@ -81,6 +96,10 @@ void    slab_free(mem_slab_t *slab, void *ptr)
                 + slab->pools[i].total_blocks * slab->pools[i].block_size;
         if (p >= start && p < end)
         {
+            /*
+             * pool_free() performs the block-boundary check internally, so
+             * an interior pointer (e.g. block+1) is safely rejected there.
+             */
             pool_free(&slab->pools[i], ptr);
             return ;
         }

@@ -6,17 +6,6 @@
 # include <stdio.h>
 #endif
 
-/* ---- Internal helpers ---------------------------------------------------- */
-
-/**
- * Round @p x up to the nearest multiple of @p align.
- * @p align must be a non-zero power of 2.
- */
-static size_t align_up(size_t x, size_t align)
-{
-    return (x + align - 1u) & ~(align - 1u);
-}
-
 /* ---- arena_init ---------------------------------------------------------- */
 
 void    arena_init(mem_arena_t *arena, void *buffer, size_t size)
@@ -34,25 +23,55 @@ void    arena_init(mem_arena_t *arena, void *buffer, size_t size)
 
 void    *arena_alloc_aligned(mem_arena_t *arena, size_t alloc_size, size_t align)
 {
-    size_t  aligned_offset;
-    void   *ptr;
+    uintptr_t current;
+    uintptr_t aligned_addr;
+    size_t    padding;
+    size_t    aligned_offset;
 
+    /* --- Parameter validation -------------------------------------------- */
     if (alloc_size == 0 || align == 0)
         return (NULL);
 
-    aligned_offset = align_up(arena->offset, align);
-
     /*
-     * Overflow-safe capacity check.
-     * Equivalent to: aligned_offset + alloc_size > arena->size
-     * but written as two separate comparisons to avoid wrap-around on
-     * SIZE_MAX-sized values.
+     * align must be a power of 2.
+     * align=3, 6, 12 etc. would produce incorrect results in bitmask
+     * arithmetic; reject them explicitly.
      */
-    if (aligned_offset > arena->size
-        || alloc_size > arena->size - aligned_offset)
+    if ((align & (align - 1u)) != 0)
         return (NULL);
 
-    ptr           = (uint8_t *)arena->start_addr + aligned_offset;
+    /*
+     * Align the *real* pointer address, not just the offset.
+     * If arena->start_addr is itself misaligned (e.g. 0x1003), aligning
+     * only the offset would leave the returned pointer misaligned.
+     */
+    current = (uintptr_t)arena->start_addr + (uintptr_t)arena->offset;
+
+    /*
+     * Overflow-safe alignment arithmetic on the actual address.
+     * Without this guard, `current + (align - 1)` could wrap around on
+     * platforms where uintptr_t == SIZE_MAX.
+     */
+    if (align > 1u && current > (uintptr_t)(UINTPTR_MAX - (align - 1u)))
+        return (NULL);
+
+    aligned_addr = (current + (uintptr_t)(align - 1u))
+                   & ~(uintptr_t)(align - 1u);
+
+    /* Bytes of padding inserted to reach the alignment boundary. */
+    padding = (size_t)(aligned_addr - current);
+
+    /*
+     * Overflow-safe capacity checks.
+     *   1) padding fits in remaining space (guards aligned_offset arithmetic)
+     *   2) alloc_size fits in the space after padding
+     */
+    if (padding > arena->size - arena->offset)
+        return (NULL);
+    aligned_offset = arena->offset + padding;
+    if (alloc_size > arena->size - aligned_offset)
+        return (NULL);
+
     arena->offset = aligned_offset + alloc_size;
 
 #ifdef LIBMEM_DEBUG
@@ -61,7 +80,7 @@ void    *arena_alloc_aligned(mem_arena_t *arena, size_t alloc_size, size_t align
         arena->peak_usage = arena->offset;
 #endif
 
-    return (ptr);
+    return ((void *)aligned_addr);
 }
 
 /* ---- arena_alloc --------------------------------------------------------- */
